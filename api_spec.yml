@@ -1,0 +1,380 @@
+openapi: '3.0.2'
+info:
+  title: Synapsis Backend API Test
+  version: '1.0'
+servers:
+  - url: https://localhost:3000/api
+paths:
+  /auth/register:
+    post:
+      summary: Register New User
+      description: Register a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '200':
+          description: Registration Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          description: Bad Request from User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error / Failed to Register User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Login Existing User
+      description: Login an existing user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Login Successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '404':
+          description: User Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Bad Request Body from User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products:
+    get:
+      summary: Get Products
+      description: Get products and filter by category.
+      parameters:
+        - in: query
+          name: category
+          description: Filter products by category.
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Product Retrieved Successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /product/add:
+    post:
+      summary: Add New Product
+      description: Add a new product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success Add New Product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewProductResponse'
+        '400':
+          description: Invalid Body Data from User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /carts:
+    get:
+      summary: Get Cart Items
+      description: Get list of product in cart.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success Get Cart Items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemsList'
+        '404':
+          description: User's Cart Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/add:
+    post:
+      summary: Add Product to Cart
+      description: Add product to user cart.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddProductToCart'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success Add Product to Cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid Body Data from User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/remove:
+    post:
+      summary: Remove Product from Cart
+      description: Remove product items from cart.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveProductFromCart'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success Remove Product from Cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Product Not Found in Cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to Remove Product Items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/checkout:
+    post:
+      summary: Checkout Cart Items
+      description: Checkout all product items in user cart.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Checkout Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+        '404':
+          description: User's Cart Not Found / Product Items Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Checkout Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        example:
+          type: string
+
+    RegistrationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+
+    UserRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        category:
+          type: string
+
+    ProductList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Product'
+
+    NewProduct:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        category:
+          type: string
+
+    NewProductResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Product'
+
+    CartItemsList:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                $ref: '#/components/schemas/Product'
+              quantity:
+                type: number
+
+    AddProductToCart:
+      type: object
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: number
+
+    RemoveProductFromCart:
+      type: object
+      properties:
+        productId:
+          type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    CheckoutResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            cartId:
+              type: integer
+            amount:
+              type: number
+            status:
+              type: string

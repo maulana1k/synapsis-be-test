@@ -1,0 +1,13 @@
+# Compiled binary files
+*.exe
+*.o
+*.out
+
+# Log files
+*.log
+
+# Dependency directories
+vendor/
+
+# Binary files for any Go projects
+/bin/

@@ -1,0 +1,7 @@
+# Ignore files and directories created by Go
+**/*.test
+**/*.out
+**/*.exe
+**/*.prof
+**/*.test
+**/vendor
