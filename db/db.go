@@ -7,8 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// DB represents the global database connection
 var DB *gorm.DB
 
+// InitDB initializes the database
 func InitDB() {
 	// Open the SQLite database file using Gorm
 	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
